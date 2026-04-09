@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>主控</title>
 </head>
 <body>
   <h2>主控页面</h2>
 
-  <button onclick="start()">开始游戏</button>
+  <input id="adminRoomCode" placeholder="房间码"><br><br>
+  <input id="password" placeholder="密码（bmsclub）"><br><br>
+  <button onclick="adminLogin()">登录</button>
+
+  <h4 id="roomInfo"></h4>
+  <h4 id="refreshTime"></h4>
+
+  <button id="startBtn" onclick="start()" disabled>开始游戏</button>
 
   <h3>玩家列表</h3>
   <ul id="players"></ul>
@@ -16,20 +21,52 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
+    const roomInfoEl = document.getElementById("roomInfo");
+    const refreshEl = document.getElementById("refreshTime");
+    const startBtn = document.getElementById("startBtn");
+    const playersEl = document.getElementById("players");
+
+    function adminLogin() {
+      const roomCode = document.getElementById("adminRoomCode").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!roomCode) {
+        roomInfoEl.innerText = "房间码必填";
+        return;
+      }
+
+      socket.emit("adminJoin", { password, roomCode });
+      roomInfoEl.innerText = "登录中…";
+    }
+
+    socket.on("adminAuth", (data) => {
+      if (!data.ok) {
+        roomInfoEl.innerText = data.msg || "登录失败";
+        startBtn.disabled = true;
+        return;
+      }
+      roomInfoEl.innerText = `房间码：${data.roomCode}`;
+      startBtn.disabled = false;
+    });
 
     function start() {
+      refreshEl.innerText = "刷新时间：" + new Date().toLocaleString();
       socket.emit("startGame");
     }
 
     socket.on("updatePlayers", (players) => {
-      const ul = document.getElementById("players");
-      ul.innerHTML = "";
+      playersEl.innerHTML = "";
 
-      Object.values(players).forEach((p) => {
+      Object.entries(players).forEach(([id, p]) => {
         const li = document.createElement("li");
-        const teamName = p.team === "red" ? "红队" : "黑队";
-        li.innerText = `${p.name} (${teamName})`;
-        ul.appendChild(li);
+        li.innerText = `${p.name} (${p.team}) `;
+
+        const btn = document.createElement("button");
+        btn.innerText = "踢";
+        btn.onclick = () => socket.emit("kickPlayer", id);
+
+        li.appendChild(btn);
+        playersEl.appendChild(li);
       });
     });
   </script>
