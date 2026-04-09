@@ -1,53 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>玩家加入</title>
 </head>
 <body>
   <h2>加入游戏</h2>
-  <input id="name" placeholder="名字" />
-  <br /><br />
+
+  <input id="roomCode" placeholder="房间码"><br><br>
+  <input id="name" placeholder="名字"><br><br>
+
   <select id="team">
     <option value="red">红队</option>
     <option value="black">黑队</option>
-  </select>
-  <br /><br />
+  </select><br><br>
+
   <button onclick="join()">加入</button>
 
-  <h3 id="result"></h3>
+  <h4 id="refreshTime"></h4>
+  <pre id="result" style="white-space: pre-wrap;"></pre>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
+    const refreshEl = document.getElementById("refreshTime");
+    const resultEl = document.getElementById("result");
 
     function join() {
+      const roomCode = document.getElementById("roomCode").value;
       const name = document.getElementById("name").value.trim();
       const team = document.getElementById("team").value;
 
+      if (!roomCode.trim()) {
+        resultEl.innerText = "请输入房间码";
+        return;
+      }
       if (!name) {
-        document.getElementById("result").innerText = "请输入名字再加入";
+        resultEl.innerText = "请输入名字再加入";
         return;
       }
 
-      document.getElementById("result").innerText = "加入中…";
-      socket.emit("join", { name, team });
+      socket.emit("join", { name, team, roomCode });
+      resultEl.innerText = "加入中…";
     }
+
+    socket.on("joinError", (data) => {
+      refreshEl.innerText = "";
+      resultEl.innerText = data.msg || "加入失败";
+    });
 
     socket.on("joined", (data) => {
       const teamName = data.team === "red" ? "红队" : "黑队";
-      document.getElementById("result").innerText =
-        "你已加入，等待主控开始";
+      resultEl.innerText = `你已加入【${teamName}】，等待主控开始`;
     });
 
     socket.on("role", (data) => {
+      const ts = new Date(data.startedAt || Date.now()).toLocaleString();
+      refreshEl.innerText = `刷新时间：${ts}`;
+
       if (data.role === "spy") {
-        document.getElementById("result").innerText =
-          "你是卧底！同伴：" + (data.teammates || []).join(", ");
+        resultEl.innerText =
+          "你是卧底！\n" +
+          "己方卧底：" + (data.ownSpies?.join(", ") || "无") + "\n" +
+          "对方卧底：" + (data.enemySpies?.join(", ") || "无");
       } else {
-        document.getElementById("result").innerText = "你是普通队员";
+        resultEl.innerText = "你是普通队员";
       }
+    });
+
+    socket.on("kicked", () => {
+      refreshEl.innerText = "";
+      resultEl.innerText = "你被主控踢出";
     });
   </script>
 </body>
