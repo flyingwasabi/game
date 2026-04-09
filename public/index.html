@@ -19,6 +19,30 @@
   <h4 id="refreshTime"></h4>
   <pre id="result" style="white-space: pre-wrap;"></pre>
 
+  <hr>
+
+  <h3>规则说明</h3>
+  <pre style="white-space: pre-wrap;">
+1) 需要主控先创建房间：
+   - 主控密码：bmsclub
+   - 房间码：由主控在主控页面输入（你们自己定）
+
+2) 玩家加入：
+   - 输入房间码、名字、选择红队/黑队
+   - 加入后等待主控开始
+
+3) 每局（刷新身份）：
+   - 队伍不变，只重新随机身份
+   - 每队随机卧底：
+     - 队伍人数 ≤ 1：不分配卧底
+     - 队伍人数 = 2：固定 1 名卧底
+     - 队伍人数 ≥ 3：随机 1 或 2 名卧底
+
+4) 身份显示：
+   - 普通队员：只显示“普通队员”
+   - 卧底：显示“己方卧底 + 对方卧底是谁”
+  </pre>
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
@@ -26,11 +50,11 @@
     const resultEl = document.getElementById("result");
 
     function join() {
-      const roomCode = document.getElementById("roomCode").value;
+      const roomCode = document.getElementById("roomCode").value.trim();
       const name = document.getElementById("name").value.trim();
       const team = document.getElementById("team").value;
 
-      if (!roomCode.trim()) {
+      if (!roomCode) {
         resultEl.innerText = "请输入房间码";
         return;
       }
