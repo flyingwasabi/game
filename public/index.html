@@ -1,29 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>玩家加入</title>
+  <style>
+    html, body { font-size: 18px; line-height: 1.6; margin: 0; padding: 0; }
+    body { padding: 14px; }
+    input, select, button, textarea { font-size: 18px; padding: 12px 10px; width: 100%; box-sizing: border-box; margin: 0 0 12px 0; }
+    button { cursor: pointer; }
+    pre { white-space: pre-wrap; margin: 12px 0 0 0; }
+    hr { margin: 14px 0; }
+    h2, h3, h4 { margin: 10px 0; }
+    .note { font-size: 16px; opacity: 0.9; }
+  </style>
 </head>
 <body>
   <h2>加入游戏</h2>
 
-  <input id="roomCode" placeholder="房间码"><br><br>
-  <input id="name" placeholder="名字"><br><br>
+  <input id="roomCode" placeholder="房间码" />
+  <input id="name" placeholder="名字" />
 
   <select id="team">
     <option value="red">红队</option>
     <option value="black">黑队</option>
-  </select><br><br>
+  </select>
 
   <button onclick="join()">加入</button>
 
   <h4 id="refreshTime"></h4>
-  <pre id="result" style="white-space: pre-wrap;"></pre>
+  <pre id="result"></pre>
 
   <hr>
 
   <h3>规则说明</h3>
-  <pre style="white-space: pre-wrap;">
+  <pre class="note">
 1) 需要主控先创建房间：
+   - 主控密码：bmsclub
    - 房间码：由主控在主控页面输入（你们自己定）
 
 2) 玩家加入：
@@ -73,7 +86,7 @@
 
     socket.on("joined", (data) => {
       const teamName = data.team === "red" ? "红队" : "黑队";
-      resultEl.innerText = `你已加入【${teamName}】，等待主控开始`;
+      resultEl.innerText = `你已加入，等待主控开始`;
     });
 
     socket.on("role", (data) => {
