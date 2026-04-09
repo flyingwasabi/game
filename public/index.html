@@ -7,13 +7,13 @@
 </head>
 <body>
   <h2>加入游戏</h2>
-  <input id="name" placeholder="名字" /><br /><br />
-
+  <input id="name" placeholder="名字" />
+  <br /><br />
   <select id="team">
     <option value="red">红队</option>
     <option value="black">黑队</option>
-  </select><br /><br />
-
+  </select>
+  <br /><br />
   <button onclick="join()">加入</button>
 
   <h3 id="result"></h3>
@@ -23,15 +23,28 @@
     const socket = io();
 
     function join() {
-      const name = document.getElementById("name").value;
+      const name = document.getElementById("name").value.trim();
       const team = document.getElementById("team").value;
+
+      if (!name) {
+        document.getElementById("result").innerText = "请输入名字再加入";
+        return;
+      }
+
+      document.getElementById("result").innerText = "加入中…";
       socket.emit("join", { name, team });
     }
+
+    socket.on("joined", (data) => {
+      const teamName = data.team === "red" ? "红队" : "黑队";
+      document.getElementById("result").innerText =
+        "你已加入，等待主控开始";
+    });
 
     socket.on("role", (data) => {
       if (data.role === "spy") {
         document.getElementById("result").innerText =
-          "你是卧底！同伴：" + data.teammates.join(", ");
+          "你是卧底！同伴：" + (data.teammates || []).join(", ");
       } else {
         document.getElementById("result").innerText = "你是普通队员";
       }
