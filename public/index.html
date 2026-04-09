@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>玩家加入</title>
+</head>
+<body>
+  <h2>加入游戏</h2>
+  <input id="name" placeholder="名字"><br><br>
+
+  <select id="team">
+    <option value="red">红队</option>
+    <option value="black">黑队</option>
+  </select><br><br>
+
+  <button onclick="join()">加入</button>
+
+  <h3 id="result"></h3>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function join() {
+      const name = document.getElementById("name").value;
+      const team = document.getElementById("team").value;
+      socket.emit("join", { name, team });
+    }
+
+    socket.on("role", (data) => {
+      if (data.role === "spy") {
+        document.getElementById("result").innerText =
+          "你是卧屋！同伴：" + data.teammates.join(", ");
+      } else {
+        document.getElementById("result").innerText =
+          "你是普通队员";
+      }
+    });
+  </script>
+</body>
+</html>
