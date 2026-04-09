@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>玩家加入</title>
 </head>
 <body>
   <h2>加入游戏</h2>
-  <input id="name" placeholder="名字"><br><br>
+  <input id="name" placeholder="名字" /><br /><br />
 
   <select id="team">
     <option value="red">红队</option>
     <option value="black">黑队</option>
-  </select><br><br>
+  </select><br /><br />
 
   <button onclick="join()">加入</button>
 
@@ -29,10 +31,9 @@
     socket.on("role", (data) => {
       if (data.role === "spy") {
         document.getElementById("result").innerText =
-          "你是卧屋！同伴：" + data.teammates.join(", ");
+          "你是卧底！同伴：" + data.teammates.join(", ");
       } else {
-        document.getElementById("result").innerText =
-          "你是普通队员";
+        document.getElementById("result").innerText = "你是普通队员";
       }
     });
   </script>
