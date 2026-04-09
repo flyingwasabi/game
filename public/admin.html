@@ -1,13 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>主控</title>
+  <style>
+    html, body { font-size: 18px; line-height: 1.6; margin: 0; padding: 0; }
+    body { padding: 14px; }
+    input, select, button { font-size: 18px; padding: 12px 10px; width: 100%; box-sizing: border-box; margin: 0 0 12px 0; }
+    button { cursor: pointer; }
+    ul { padding-left: 16px; }
+    li { margin: 8px 0; }
+    li button { width: auto; margin-left: 8px; }
+    h2, h3, h4 { margin: 10px 0; }
+  </style>
 </head>
 <body>
   <h2>主控页面</h2>
 
-  <input id="adminRoomCode" placeholder="房间码"><br><br>
-  <input id="password" placeholder="密码"><br><br>
+  <input id="adminRoomCode" placeholder="房间码" />
+  <input id="password" placeholder="密码（bmsclub）" />
+
   <button onclick="adminLogin()">登录</button>
 
   <h4 id="roomInfo"></h4>
@@ -59,7 +72,7 @@
 
       Object.entries(players).forEach(([id, p]) => {
         const li = document.createElement("li");
-        li.innerText = `${p.name} (${p.team}) `;
+        li.innerText = `${p.name} (${p.team})`;
 
         const btn = document.createElement("button");
         btn.innerText = "踢";
