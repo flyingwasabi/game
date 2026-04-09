@@ -16,6 +16,9 @@ io.on("connection", (socket) => {
 
   socket.on("join", ({ name, team }) => {
     players[socket.id] = { name, team };
+
+    socket.emit("joined", { team });
+
     io.emit("updatePlayers", players);
   });
 
